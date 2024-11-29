@@ -1,58 +1,165 @@
-interface ILevels {
-  levels?: string[],
-  notFound?: boolean
-}
+"use client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-async function getLevels(): Promise<ILevels> {
-  try {
-    const res = await fetch('https://tools.qa.public.ale.ai/api/tools/candidates/levels')
-    const data = await res.json()
-    return data
-  } catch (err) {
-    console.warn('THE ERROR OCCURED:', err)
-    return {
-      notFound: true
+export default function Home() {
+  const router = useRouter();
+  const [levels, setLevels] = useState({ notFound: true });
+  const [formState, setFormState] = useState({
+    name: "",
+    email: "",
+    assignment_description: "",
+    github_repo_url: "",
+    candidate_level: "Junior",
+  });
+
+  const [formErrors, setFormErrors] = useState({
+    Name: "",
+    Email: "",
+    Assignment: "",
+    GitHub: "",
+    Validation: "",
+  });
+
+  async function getLevels() {
+    try {
+      const res = await fetch(
+        "https://tools.qa.public.ale.ai/api/tools/candidates/levels"
+      );
+      const data = await res.json();
+      setLevels(data);
+    } catch (err) {
+      console.error("An error occured while fetching candidate levels:", err);
+      setLevels({ notFound: true });
     }
   }
-}
 
-export default async function Home() {
-  const levels = await getLevels()
+  async function formSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    try {
+      const res = await fetch(
+        "https://tools.qa.public.ale.ai/api/tools/candidates/assignments",
+        {
+          method: "POST",
+          body: JSON.stringify(formState),
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.status === "error") {
+        data.errors.push(data.message);
+        updateFormFieldErrors(data.errors);
+      }
+      if (data.status === "success") {
+        // if (typeof window !== 'undefined') window.sessionStorage.setItem('user', JSON.stringify(data))
+        router.push("/thank-you");
+      }
+    } catch (err) {
+      console.error("An error occured while submitting the form:", err);
+    }
+  }
+
+  function updateFormField(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  }
+
+  function updateFormFieldErrors(errorsArr: string[]) {
+    errorsArr.forEach((error) => {
+      const currentErr = error.split(" ")[0];
+      setFormErrors((prevState) => ({
+        ...prevState,
+        [currentErr]: error,
+      }));
+    });
+  }
+
+  useEffect(() => {
+    getLevels();
+  }, []);
+
   return (
     <div>
       <main>
         <h1>Submission portal</h1>
-        <form>
+        <form onSubmit={(e) => formSubmit(e)}>
           <div>
             <label htmlFor="name-input">Name</label>
-            <input className="border block" required type="text" name="name-input" />
-            <small className="text-red-600">err text</small>
+            <input
+              className="border block"
+              required
+              type="text"
+              name="name"
+              value={formState.name}
+              onChange={(e) => updateFormField(e)}
+            />
+            <small className="text-red-600">{formErrors.Name}</small>
           </div>
           <div className="border-t-2 border-t-slate-200">
             <label htmlFor="email-input">Email</label>
-            <input className="border block" required type="email" name="email-input" />
-            <small className="text-red-600">err text</small>
+            <input
+              className="border block"
+              required
+              type="email"
+              name="email"
+              value={formState.email}
+              onChange={(e) => updateFormField(e)}
+            />
+            <small className="text-red-600">{formErrors.Email}</small>
           </div>
           <div className="border-t-2 border-t-slate-200">
-            <label htmlFor="description-input">Assignment Description:</label>
-            <textarea className="border block" required name="description-input" />
-            <small className="text-red-600">err text</small>
+            <label htmlFor="assignment_description">
+              Assignment Description:
+            </label>
+            <textarea
+              className="border block"
+              required
+              name="assignment_description"
+              value={formState.assignment_description}
+              onChange={(e) => updateFormField(e)}
+            />
+            <small className="text-red-600">{formErrors.Assignment}</small>
           </div>
           <div className="border-t-2 border-t-slate-200">
-            <label htmlFor="repo-input">GitHub Repository URL</label>
-            <input className="border block" required type="url" name="repo-input" />
-            <small className="text-red-600">err text</small>
+            <label htmlFor="github_repo_url">GitHub Repository URL</label>
+            <input
+              className="border block"
+              required
+              type="url"
+              name="github_repo_url"
+              value={formState.github_repo_url}
+              onChange={(e) => updateFormField(e)}
+            />
+            <small className="text-red-600">{formErrors.GitHub}</small>
           </div>
           <div className="border-t-2 border-t-slate-200 mb-8">
-            <select name="levels-select" id="lvl-select" required> 
-              {!levels.notFound && levels.levels?.map((name) =>
-                <option key={name}>{name}</option>
-              )}
+            <select
+              name="candidate_level"
+              id="lvl-select"
+              required
+              value={formState.candidate_level}
+              onChange={(e) => updateFormField(e)}
+            >
+              {!levels.notFound &&
+                levels?.levels.map((name: string) => (
+                  <option key={name}>{name}</option>
+                ))}
             </select>
-            <small className="text-red-600">{levels.notFound && 'Error fetching data'}</small>
+            <small className="text-red-600">
+              {levels.notFound && "Error fetching data"}
+            </small>
           </div>
-          <button className="border border- block bg-emerald-400 p-4">Submit</button>
-          <strong className="block mt-3 text-red-600">err text</strong>
+          <button className="border border- block bg-emerald-400 p-4">
+            Submit
+          </button>
+          <strong className="block mt-3 text-red-600">
+            {formErrors.Validation}
+          </strong>
         </form>
       </main>
     </div>
