@@ -1,7 +1,9 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
   const [levels, setLevels] = useState({ notFound: true });
   const [formState, setFormState] = useState({
     name: "",
@@ -16,8 +18,8 @@ export default function Home() {
     Email: "",
     Assignment: "",
     GitHub: "",
-    Validation: ""
-  })
+    Validation: "",
+  });
 
   async function getLevels() {
     try {
@@ -33,31 +35,33 @@ export default function Home() {
   }
 
   async function formSubmit(e: React.FormEvent<HTMLFormElement>) {
-    console.log("form submit");
     e.preventDefault();
     try {
-      const res = await fetch("https://tools.qa.public.ale.ai/api/tools/candidates/assignments", {
-        method: "POST",
-        body: JSON.stringify(formState),
-        headers: {
-          "content-type": "application/json",
+      const res = await fetch(
+        "https://tools.qa.public.ale.ai/api/tools/candidates/assignments",
+        {
+          method: "POST",
+          body: JSON.stringify(formState),
+          headers: {
+            "content-type": "application/json",
+          },
         }
-      })
-      const data = await res.json()
-      if (data.status === 'error') {
-        data.errors.push(data.message)
-        updateFormFieldErrors(data.errors)
-      } else if (data.status === 'success') {
-        alert('TATS A SUCC')
+      );
+      const data = await res.json();
+      if (data.status === "error") {
+        data.errors.push(data.message);
+        updateFormFieldErrors(data.errors);
       }
-      console.log(data)
+      if (data.status === "success") {
+        // if (typeof window !== 'undefined') window.sessionStorage.setItem('user', JSON.stringify(data))
+        router.push("/thank-you");
+      }
     } catch (err) {
       console.error("An error occured while submitting the form:", err);
     }
   }
 
   function updateFormField(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log("updating");
     const { name, value } = e.target;
     setFormState((prevState) => ({
       ...prevState,
@@ -67,22 +71,17 @@ export default function Home() {
 
   function updateFormFieldErrors(errorsArr: string[]) {
     errorsArr.forEach((error) => {
-      const currentErr = error.split(' ')[0]
+      const currentErr = error.split(" ")[0];
       setFormErrors((prevState) => ({
         ...prevState,
-        [currentErr]: error
-      }))
-    })
+        [currentErr]: error,
+      }));
+    });
   }
-
 
   useEffect(() => {
     getLevels();
   }, []);
-
-  useEffect(() => {
-    console.log(formState);
-  }, [formState, setFormState]);
 
   return (
     <div>
@@ -114,7 +113,9 @@ export default function Home() {
             <small className="text-red-600">{formErrors.Email}</small>
           </div>
           <div className="border-t-2 border-t-slate-200">
-            <label htmlFor="assignment_description">Assignment Description:</label>
+            <label htmlFor="assignment_description">
+              Assignment Description:
+            </label>
             <textarea
               className="border block"
               required
@@ -156,7 +157,9 @@ export default function Home() {
           <button className="border border- block bg-emerald-400 p-4">
             Submit
           </button>
-          <strong className="block mt-3 text-red-600">{formErrors.Validation}</strong>
+          <strong className="block mt-3 text-red-600">
+            {formErrors.Validation}
+          </strong>
         </form>
       </main>
     </div>
