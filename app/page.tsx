@@ -51,11 +51,11 @@ export default function Home() {
           },
         }
       );
-      setIsLoading(false);
       const data = await res.json();
       if (data.status === "error") {
         data.errors.push(data.message);
         updateFormFieldErrors(data.errors);
+        setIsLoading(false);
       }
       if (data.status === "success") {
         router.push("/thank-you");
@@ -97,13 +97,21 @@ export default function Home() {
       {isLoading ? (
         <Loading />
       ) : (
-        <main>
-          <h1>Submission portal</h1>
-          <form onSubmit={(e) => formSubmit(e)}>
-            <div>
-              <label htmlFor="name-input">Name</label>
+        <main className="app-container">
+          <form
+            className="app-container-vertical"
+            onSubmit={(e) => formSubmit(e)}
+          >
+            <div className="border-l-2 border-l-black border-dotted p-2">
+              <img className="w-48" src="/next.svg" alt="logo" />
+              <h1 className="app-heading">Submission portal</h1>
+            </div>
+            <div className="app-form-field">
+              <label className="app-label" htmlFor="name-input">
+                Name:
+              </label>
               <input
-                className="border block"
+                className="app-input-field"
                 required
                 type="text"
                 id="name-input"
@@ -111,12 +119,14 @@ export default function Home() {
                 value={formState.name}
                 onChange={(e) => updateFormField(e)}
               />
-              <small className="text-red-600">{formErrors.Name}</small>
+              <small className="block text-red-600">{formErrors.Name}</small>
             </div>
-            <div className="border-t-2 border-t-slate-200">
-              <label htmlFor="email-input">Email</label>
+            <div className="app-form-field">
+              <label className="app-label" htmlFor="email-input">
+                Email:
+              </label>
               <input
-                className="border block"
+                className="app-input-field"
                 required
                 id="email-input"
                 type="email"
@@ -124,28 +134,33 @@ export default function Home() {
                 value={formState.email}
                 onChange={(e) => updateFormField(e)}
               />
-              <small className="text-red-600">{formErrors.Email}</small>
+              <small className="block text-red-600">{formErrors.Email}</small>
             </div>
-            <div className="border-t-2 border-t-slate-200">
-              <label htmlFor="assignment_description-input">
+            <div className="app-form-field">
+              <label
+                className="app-label"
+                htmlFor="assignment_description-input"
+              >
                 Assignment Description:
               </label>
               <textarea
-                className="border block"
+                className="border rounded-md block w-full h-36 px-2 pt-2"
                 required
                 id="assignment_description-input"
                 name="assignment_description"
                 value={formState.assignment_description}
                 onChange={(e) => updateFormField(e)}
               />
-              <small className="text-red-600">{formErrors.Assignment}</small>
+              <small className="block text-red-600">
+                {formErrors.Assignment}
+              </small>
             </div>
-            <div className="border-t-2 border-t-slate-200">
-              <label htmlFor="github_repo_url-input">
-                GitHub Repository URL
+            <div className="app-form-field">
+              <label className="app-label" htmlFor="github_repo_url-input">
+                GitHub Repository URL:
               </label>
               <input
-                className="border block"
+                className="app-input-field"
                 required
                 type="url"
                 id="github_repo_url-input"
@@ -153,29 +168,35 @@ export default function Home() {
                 value={formState.github_repo_url}
                 onChange={(e) => updateFormField(e)}
               />
-              <small className="text-red-600">{formErrors.GitHub}</small>
+              <small className="block text-red-600">{formErrors.GitHub}</small>
             </div>
-            <div className="border-t-2 border-t-slate-200 mb-8">
-              <label htmlFor="lvl-select">Candidate Level</label>
-              <select
-                name="candidate_level"
-                id="lvl-select"
-                required
-                value={formState.candidate_level}
-                onChange={(e) => updateFormField(e)}
-              >
-                {!levels.notFound &&
-                  levels?.levels.map((name: string) => (
-                    <option key={name}>{name}</option>
-                  ))}
-              </select>
-              <small className="text-red-600">
-                {levels.notFound && "Error fetching data. try reloading the page."}
-              </small>
+            <div className="app-select-container">
+              <div>
+                <label className="app-label" htmlFor="lvl-select">
+                  Candidate Level
+                </label>
+                <select
+                  className="app-select"
+                  name="candidate_level"
+                  id="lvl-select"
+                  required
+                  value={formState.candidate_level}
+                  onChange={(e) => updateFormField(e)}
+                >
+                  {!levels.notFound &&
+                    levels?.levels.map((name: string) => (
+                      <option key={name}>{name}</option>
+                    ))}
+                </select>
+                <small className="block text-red-600">
+                  {levels.notFound &&
+                    "Error fetching data. try reloading the page."}
+                </small>
+              </div>
             </div>
-            <button className="border border- block bg-emerald-400 p-4">
-              Submit
-            </button>
+            <div className="w-56 flex justify-center pb-6 border-l-2 border-b-black border-l-black border-dotted">
+              <button className="app-button">Submit</button>
+            </div>
             <strong className="block mt-3 text-red-600">
               {formErrors.Validation}
             </strong>
