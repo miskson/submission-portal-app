@@ -7,7 +7,7 @@ Clone project on your local machine, then navigate to folder where the project i
 npm install
 ```
 
-First, run the development server:
+Then you can run the development server:
 
 ```bash
 npm run dev
