@@ -5,3 +5,42 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+.app-button {
+  @apply block rounded-md py-3 px-3 text-lg transition-colors enabled:bg-green-400 disabled:bg-gray-400 font-mono disabled:text-gray-300 enabled:text-gray-800 enabled:active:bg-green-300 enabled:active:text-gray-900 enabled:hover:bg-green-500;
+}
+
+.app-label {
+  @apply block text-base font-mono;
+}
+
+.app-select-container {
+  @apply w-56 sm:mx-2 my-5 flex flex-auto flex-wrap flex-col sm:flex-row place-content-evenly space-y-4 sm:space-x-4 sm:space-y-0 p-5 border border-slate-300 rounded-md;
+}
+
+.app-select {
+  @apply border max-w-64 sm:max-w-fit border-gray-300 rounded-md p-2 bg-white text-gray-900;
+}
+
+.app-container {
+  @apply flex w-screen h-auto items-center justify-center;
+}
+.app-container-vertical {
+  @apply shadow border rounded-lg my-2 mt-10 px-4 py-4 flex flex-col justify-center items-center;
+}
+
+.app-heading {
+  @apply text-2xl mb-6 mt-2 text-center;
+}
+
+.app-form-field,
+.app-form-err {
+  @apply my-4 w-56;
+}
+
+.app-input-field {
+  @apply border-b-2 pl-2 pt-1;
+}
+
+.screen-height {
+  @apply h-screen;
+}
