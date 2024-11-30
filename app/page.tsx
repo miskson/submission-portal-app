@@ -3,10 +3,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "./_components/Loading/loading";
 
+type LevelsState = { notFound: boolean } | { levels: string[] };
+
 export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  const [levels, setLevels] = useState({ notFound: true });
+  const [levels, setLevels] = useState<LevelsState>({ notFound: true });
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -91,6 +93,10 @@ export default function Home() {
   useEffect(() => {
     getLevels();
   }, []);
+
+  const isLevelsAvailable = (
+    levels: LevelsState
+  ): levels is { levels: string[] } => "levels" in levels;
 
   return (
     <div>
@@ -183,13 +189,13 @@ export default function Home() {
                   value={formState.candidate_level}
                   onChange={(e) => updateFormField(e)}
                 >
-                  {!levels.notFound &&
-                    levels?.levels.map((name: string) => (
+                  {isLevelsAvailable(levels) &&
+                    levels.levels.map((name: string) => (
                       <option key={name}>{name}</option>
                     ))}
                 </select>
                 <small className="block text-red-600">
-                  {levels.notFound &&
+                  {!isLevelsAvailable(levels) &&
                     "Error fetching data. try reloading the page."}
                 </small>
               </div>
